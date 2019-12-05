@@ -56,13 +56,27 @@ juju run --unit kubernetes-worker/2 "open-port 44134"
 ## Deploy Helm
 Duration: 5:00
 
-We can deploy Helm using the snap or from an installer script.
+We can deploy Helm using the snap or from an installer script. 
+
+positive
+: Helm 3.0 introduced new features that include changes in the chart installation process and removal of in-cluster (Tiller) component and default repositories. This tutorial will include directions for both versions.
 
 ### Deploy using snap 
 
 ```
 sudo apt-get install snapd
-sudo snap install helm
+```
+
+For Helm 3:
+
+```
+sudo snap install helm --classic
+```
+
+For Helm 2:
+
+```
+sudo snap install helm --channel=2.16/stable --classic
 ```
 
 ### Deploy from script
@@ -71,41 +85,69 @@ Helm now has an [installer script](https://github.com/helm/helm/blob/master/scri
 
 ```
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
+```
+
+For Helm 2 we can use another [installer script](https://github.com/helm/helm/blob/master/scripts/get) from the official repository:
+
+```
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
+```
+
+This will download Helm from GitHub. Now we are ready to deploy the binary. 
+```
 chmod 700 get_helm.sh
 ./get_helm.sh
 ```
 
-This will download Helm from GitHub and deploy the binary. Helm should now be ready to roll on your cluster.
+For Helm 2 we will need to run the init command and check the status of the Tiller pods:
+
+```
+helm init
+kubectl -n kube-system get pods
+```
+
+Helm should now be ready to roll on your cluster. 
 
 ## Deploying a Chart
 Duration: 7:00
 
 A chart is a Helm package that contains information sufficient for installing a set of Kubernetes resources into a Kubernetes cluster. Charts contain a Chart.yaml file as well as templates, default values (values.yaml), and dependencies.
+
 After release 3.0.0 Helm changed the experience with repositories and now no longer includes stable charts repository by default. 
-So one of the first things to do is to add repositories that contain charts that we want. We can search [Helm Hub](https://hub.helm.sh/) and usually chart's page contains the information about the repository.
-And we can also add stable and incubator repositories which will be supported by Helm Hub until May 13, 2020:
+So one of the first things to do is to add repositories that contain charts that we want. We can search [Helm Hub](https://hub.helm.sh/) and usually chart's page contains the link to the repository.
+And we can also add stable repository which will be supported by Helm Hub until May 13, 2020. You can skip this step if you are using Helm 2.
 
 ```
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
-helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
 ```
 
 After repositories are added we need to run an update to get the latest charts:
 
 `helm repo update`
 
-Next we can search charts in our repos:
+Next we can search charts in our repos. For Helm 3:
 
 ```
 helm search repo docker-registry
-NAME                     	CHART VERSION	APP VERSION	DESCRIPTION                     
-incubator/docker-registry	0.3.0        	2.6.2      	A Helm chart for Docker Registry
-stable/docker-registry   	1.8.3        	2.7.1      	A Helm chart for Docker Registry
+NAME                    CHART VERSION	APP VERSION	DESCRIPTION                     
+stable/docker-registry  1.8.3        	2.7.1      	A Helm chart for Docker Registry
 ```
+For Helm 2:
 
-And finally we can install a simple chart:
+```
+helm search docker-registry
+NAME                  	CHART VERSION	APP VERSION	DESCRIPTION                     
+stable/docker-registry	1.8.3        	2.7.1      	A Helm chart for Docker Registry
+```
+And finally we can install a simple chart. For Helm 3:
 
 `helm install docker-registry stable/docker-registry`
+
+For Helm 2:
+
+```
+helm install stable/docker-registry
+```
 
 ### Writing a Chart
 If you want to write your own chart take a look at the full guide provided in the [Helm Manual](https://helm.sh/docs/topics/charts/).
