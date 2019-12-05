@@ -27,7 +27,7 @@ Helm is a tool that streamlines installing and managing Kubernetes applications.
 - a Charmed Kubernetes cluster
 
 positive
-: If you do not have a Charmed Kubernetes cluster, you can refer to the following [tutorial](https://tutorials.ubuntu.com/tutorial/get-started-charmed-kubernetes) to spin up one in minutes. Charmed Kubernetes is a production-grade Kubernetes offering from Canonical which is fully compliant with the upstream project. Get Charmed Kubernetes right away and benefit from simplified deployments and operations provided by Juju charms.
+: If you do not have a Charmed Kubernetes cluster, you can refer to the following [tutorial](https://tutorials.ubuntu.com/tutorial/get-started-charmed-kubernetes) to spin up one in minutes. Charmed Kubernetes is a production-grade Kubernetes offering from Canonical which is fully compliant with the upstream project.
 
 Survey
 : How will you use this tutorial?
@@ -41,16 +41,14 @@ Survey
 ## Prepare your cluster
 Duration: 2:00
 
-Make sure that your Kubernetes cluster is running and kubectl config is in ~/.kube/config.
+Make sure that your Kubernetes cluster is running and kubectl config is in `~/.kube/config`.
 
 `juju scp kubernetes-master/0:config ~/.kube/config`
 
 Also make sure you have opened the Helm port 44134 on all your worker nodes:
 
 ```
-juju run --unit kubernetes-worker/0 "open-port 44134"
-juju run --unit kubernetes-worker/1 "open-port 44134"
-juju run --unit kubernetes-worker/2 "open-port 44134"
+juju exec --app kubernetes-worker "open-port 44134"
 ```
 
 ## Deploy Helm
